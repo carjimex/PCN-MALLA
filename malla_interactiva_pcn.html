@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Malla Interactiva PCN</title>
+  <style>
+    body { font-family: Arial, sans-serif; background: #f7f7f7; padding: 20px; }
+    h1 { text-align: center; }
+    .grid { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; }
+    .curso {
+      border: 1px solid #ccc;
+      border-radius: 10px;
+      padding: 15px;
+      background: #eee;
+      width: 240px;
+      text-align: center;
+      opacity: 0.5;
+      pointer-events: none;
+      transition: all 0.3s ease-in-out;
+    }
+    .curso.activo {
+      background: #c8f7c5;
+      opacity: 1;
+      pointer-events: auto;
+      cursor: pointer;
+    }
+    .curso.aprobado {
+      background: #a0e0a0;
+    }
+  </style>
+</head>
+<body>
+
+<h1>Malla Curricular Interactiva - PCN</h1>
+<div class="grid" id="malla"></div>
+
+<script>
+const cursos = [
+  { id: "IPD", nombre: "Introducción a la profesión docente", prereq: [] },
+  { id: "ECU", nombre: "Estructura y composición del universo", prereq: [] },
+  { id: "IMC", nombre: "Introducción a la metodología científica", prereq: [] },
+  { id: "DPC1", nombre: "Desarrollo del pensamiento científico I", prereq: [] },
+  { id: "MAT1", nombre: "Matemática I", prereq: [] },
+  { id: "EA", nombre: "Escritura Académica", prereq: [] },
+  { id: "HCH", nombre: "Historia y fundamentos de la educación", prereq: [] },
+  { id: "DJ", nombre: "Desarrollo juvenil", prereq: [] },
+  { id: "TSC", nombre: "La Tierra como sistema complejo", prereq: [] },
+  { id: "EM", nombre: "Energía y movimiento", prereq: ["IMC", "MAT1"] },
+  { id: "DPC2", nombre: "Desarrollo del pensamiento científico II", prereq: ["DPC1"] },
+  { id: "MAT2", nombre: "Matemática II", prereq: ["MAT1"] }
+];
+
+const aprobados = new Set();
+
+function crearCurso(curso) {
+  const div = document.createElement('div');
+  div.id = curso.id;
+  div.className = 'curso';
+  div.innerText = curso.nombre;
+  div.onclick = () => aprobarCurso(curso.id);
+  return div;
+}
+
+function aprobarCurso(id) {
+  const curso = document.getElementById(id);
+  curso.classList.add("aprobado");
+  curso.classList.remove("activo");
+  curso.onclick = null;
+  aprobados.add(id);
+  actualizarCursos();
+}
+
+function actualizarCursos() {
+  cursos.forEach(curso => {
+    if (!aprobados.has(curso.id)) {
+      const prereqCumplidos = curso.prereq.every(p => aprobados.has(p));
+      const div = document.getElementById(curso.id);
+      if (prereqCumplidos) {
+        div.classList.add("activo");
+      }
+    }
+  });
+}
+
+const contenedor = document.getElementById("malla");
+cursos.forEach(c => contenedor.appendChild(crearCurso(c)));
+actualizarCursos();
+</script>
+
+</body>
+</html>
